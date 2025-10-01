@@ -16,39 +16,37 @@
 
 ```text
 
-<div>
 Cuatro personas necesitan cruzar un puente de noche con un sola
 linterna. El puente es frágil y solo puede soportar a dos personas a
 la vez. Cada persona tarda diferentes tiempos en cruzar (1, 2 5 y 10
 minutos).  Cuando dos personas cruzan, lo hacen al ritmo del más lento
 ¿Cómo pueden todos cruzar el puente en 17 minutos?
-</div>
 
-## Estrategia Óptima (17 minutos)
+Estrategia Óptima (17 minutos)
 
-1. **Cruzan 1 y 2** → tiempo = 2  
+1. Cruzan 1 y 2 → tiempo = 2  
    Estado: izquierda {5,10} — derecha {1,2}  
    Acumulado = 2
 
-2. **Regresa 1** → tiempo = 1  
+2. Regresa 1 → tiempo = 1  
    Estado: izquierda {1,5,10} — derecha {2}  
    Acumulado = 3
 
-3. **Cruzan 5 y 10** → tiempo = 10  
+3. Cruzan 5 y 10 → tiempo = 10  
    Estado: izquierda {1} — derecha {2,5,10}  
    Acumulado = 13
 
-4. **Regresa 2** → tiempo = 2  
+4. Regresa 2 → tiempo = 2  
    Estado: izquierda {1,2} — derecha {5,10}  
    Acumulado = 15
 
-5. **Cruzan 1 y 2** → tiempo = 2  
+5. Cruzan 1 y 2 → tiempo = 2  
    Estado: izquierda {} — derecha {1,2,5,10}  
    Acumulado = 17
 
-**Resultado final:** todos cruzan en **17 minutos**.
+Resultado final: todos cruzan en **17 minutos**.
 
-## Justificación de Optimalidad
+ Justificación de Optimalidad
 - Si los dos más lentos cruzan por separado, el tiempo mínimo sería ≥ 19.  
 - La única forma de reducir es que crucen juntos (5 y 10).  
 - Usando a los más rápidos (1 y 2) para regresar la linterna, se obtiene el mínimo posible.  
@@ -119,4 +117,5 @@ Paso 5: Distribución final
 El (Alemán) (casa verde, nº4) es el dueño del **pez**.
 
 ```
+
 
