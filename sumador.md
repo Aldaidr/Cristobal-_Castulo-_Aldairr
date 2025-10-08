@@ -30,8 +30,6 @@ usuario una vez concluido el proceso.
 <p>El código implementa una función recursiva en Lisp que simula el proceso de multiplicación mediante sumas repetidas. Tras solicitar al usuario dos números, la función recursiva ejecuta una suma acumulativa del primer número, disminuyendo el segundo parámetro en cada llamada, hasta llegar a la condición base. El resultado final corresponde al producto de ambos valores.
 </p>
 
-
-<pre> ```
 (defun potencia-rapida (base exponente)
   (cond
     ((= exponente 0) 1) ; caso base
@@ -52,7 +50,6 @@ usuario una vez concluido el proceso.
 (inicio)
 
 
-``` </pre>
 
 
 
