@@ -19,34 +19,35 @@
 
 <div align="center">
 <h3>Introducción</h3>
-<p>El presente documento explica el funcionamiento del sistema experto ELIZA desarrollado en Prolog, el cual integra una base de conocimiento sobre enfermedades, síntomas, tratamientos, médicos y centros de atención, permitiendo realizar diagnósticos automáticos y consultas sobre relaciones familiares y jugadores del Club América. ELIZA simula interacción con el usuario y utiliza reglas lógicas para inferir información.</p>
+<p>El presente documento explica el funcionamiento del sistema experto ELIZA desarrollado en Prolog y su versión en Lisp. El sistema integra una base de conocimiento sobre enfermedades, síntomas, tratamientos, médicos, centros de atención, relaciones familiares y jugadores del Club América. ELIZA simula interacción con el usuario utilizando reglas lógicas, permitiendo realizar diagnósticos automáticos, generar reportes y responder consultas sobre diferentes temas.</p>
 </div>
-
 
 <hr>
 
+<div align="center">
+<h3>Objetivos del Sistema</h3>
 <ul>
-<li>Diagnóstico médico basado en síntomas.</li>
-<li>Consultas de relaciones familiares (padre, madre, abuelo).</li>
-<li>Un juego tipo Akinator para adivinar jugadores del Club América.</li>
-<li>Simulación de interacción con el usuario, procesamiento de reglas lógicas y generación de reportes.</li>
+<li>Realizar diagnóstico médico basado en síntomas del paciente.</li>
+<li>Consultar relaciones familiares (padre, madre, abuelo).</li>
+<li>Jugar a un Akinator para adivinar jugadores del Club América.</li>
+<li>Simular interacción con el usuario, procesando reglas lógicas y generando reportes automáticos.</li>
+<li>Explicar el funcionamiento de predicados y reglas de inferencia en Prolog y Lisp.</li>
 </ul>
-<p>Se explican los predicados, reglas de inferencia, base de conocimiento y ejemplos de consultas para demostrar el funcionamiento del sistema.</p>
 </div>
 
 <hr>
 
 <div align="center">
 <h3>Base de Conocimiento</h3>
-<p>La base de conocimiento incluye:</p>
+<p>La base de conocimiento del sistema incluye:</p>
 <ul>
-<li>Enfermedades y sus síntomas.</li>
-<li>Tratamientos y medicamentos asociados.</li>
-<li>Médicos especializados y centros médicos.</li>
-<li>Jugadores del Club América y árbol genealógico.</li>
-<li>Reglas para diagnóstico exclusivo, por probabilidad, preventivo, y combinación de tratamientos.</li>
+<li>Enfermedades y sus síntomas (ej. fiebre, dolor de cabeza, cansancio).</li>
+<li>Tratamientos y medicamentos asociados a cada enfermedad.</li>
+<li>Información sobre médicos especializados y centros médicos.</li>
+<li>Jugadores del Club América y su árbol genealógico.</li>
+<li>Reglas para diagnóstico: exclusivo, por probabilidad, preventivo y combinaciones de tratamientos.</li>
 <li>Relaciones familiares: padre, madre, abuelo.</li>
-<li>Detección de síntomas contradictorios.</li>
+<li>Detección de síntomas contradictorios o inconsistentes.</li>
 </ul>
 </div>
 
@@ -54,8 +55,10 @@
 
 <div align="center">
 <h3>Predicados principales en Prolog</h3>
+<p>Esta sección contiene la definición de enfermedades, síntomas, relaciones entre ellos y tratamientos. Cada predicado permite inferir información automáticamente.</p>
 <pre>
 % --- Enfermedades ---
+% Se definen las enfermedades conocidas por el sistema.
 enfermedad(covid).
 enfermedad(sinusitis).
 enfermedad(bronquitis).
@@ -63,17 +66,20 @@ enfermedad(otitis).
 enfermedad(gastritis).
 
 % --- Síntomas ---
+% Se definen los síntomas posibles que pueden registrar los pacientes.
 sintoma(fiebre).
 sintoma(tos).
 sintoma(dolor_garganta).
 sintoma(dificultad_respirar).
 
 % --- Relación enfermedad ↔ síntomas ---
+% Define qué síntomas corresponden a cada enfermedad.
 tiene_sintoma(covid, fiebre).
 tiene_sintoma(covid, tos).
 tiene_sintoma(covid, dificultad_respirar).
 
 % --- Tratamientos ---
+% Asocia tratamientos a cada enfermedad.
 tratamiento(covid, reposo).
 tratamiento(covid, paracetamol).
 </pre>
@@ -83,7 +89,9 @@ tratamiento(covid, paracetamol).
 
 <div align="center">
 <h3>Jugadores del Club América y Árbol Genealógico</h3>
+<p>Define los jugadores del Club América y un ejemplo de árbol familiar que puede ser consultado por el sistema.</p>
 <pre>
+% --- Jugadores ---
 jugador(henry_martin).
 jugador(luis_malagon).
 jugador(alvaro_fidalgo).
@@ -96,7 +104,8 @@ jugador(sebastian_caceres).
 jugador(igor_lichnovsky).
 jugador(kevin_alvarez).
 
-% Árbol familiar de ejemplo
+% --- Árbol familiar de ejemplo ---
+% Permite realizar consultas sobre relaciones de parentesco.
 padre(juan, alvaro_fidalgo).
 madre(maria, alvaro_fidalgo).
 abuelo(jorge, alvaro_fidalgo).
@@ -111,14 +120,17 @@ abuelo(carlos, diego_valdes).
 
 <div align="center">
 <h3>Diagnósticos y Reglas</h3>
+<p>Se muestran las reglas utilizadas para el diagnóstico. Estas reglas permiten inferir enfermedades a partir de los síntomas registrados.</p>
 <pre>
-% Diagnóstico exclusivo
+% --- Diagnóstico exclusivo ---
+% Determina si un paciente tiene una enfermedad de forma exclusiva, sin coincidencias con otras enfermedades.
 diagnostico_exclusivo(Paciente, Enfermedad) :-
   tiene_sintoma(Paciente, Sintoma),
   tiene_sintoma(Enfermedad, Sintoma),
   \+ (tiene_sintoma(Otra, Sintoma), Otra \= Enfermedad).
 
-% Diagnóstico por probabilidad
+% --- Diagnóstico por probabilidad ---
+% Calcula la probabilidad de que un paciente tenga una enfermedad según los síntomas coincidentes.
 probabilidad(Paciente, Enfermedad, Porcentaje) :-
   findall(S, tiene_sintoma(Enfermedad, S), ListaSintomas),
   findall(S, (tiene_sintoma(Paciente, S), member(S, ListaSintomas)), Confirmados),
@@ -126,7 +138,8 @@ probabilidad(Paciente, Enfermedad, Porcentaje) :-
   length(Confirmados, Cont),
   Porcentaje is (Cont / Totales) * 100.
 
-% Diagnóstico preventivo
+% --- Diagnóstico preventivo ---
+% Evalúa si un paciente podría tener la enfermedad, considerando solo algunos síntomas.
 diagnostico_preventivo(Paciente, Enfermedad) :-
   findall(S, tiene_sintoma(Enfermedad, S), Sintomas),
   findall(S, (tiene_sintoma(Paciente, S), member(S, Sintomas)), Confirmados),
@@ -141,13 +154,14 @@ diagnostico_preventivo(Paciente, Enfermedad) :-
 
 <div align="center">
 <h3>Ejemplos de Consultas</h3>
+<p>Estas consultas permiten al usuario interactuar con el sistema y obtener información sobre enfermedades y relaciones familiares.</p>
 <pre>
-?- tiene_sintoma(alvaro_fidalgo, fiebre).
-?- diagnostico_exclusivo(alvaro_fidalgo, covid).
-?- probabilidad(alvaro_fidalgo, covid, P).
-?- diagnostico_preventivo(alvaro_fidalgo, covid).
-?- padre(juan, alvaro_fidalgo).
-?- jugador(alvaro_fidalgo).
+?- tiene_sintoma(alvaro_fidalgo, fiebre).       % Consulta si el paciente tiene fiebre
+?- diagnostico_exclusivo(alvaro_fidalgo, covid). % Verifica diagnóstico exclusivo
+?- probabilidad(alvaro_fidalgo, covid, P).      % Calcula la probabilidad de covid
+?- diagnostico_preventivo(alvaro_fidalgo, covid). % Diagnóstico preventivo
+?- padre(juan, alvaro_fidalgo).                % Consulta relación de parentesco
+?- jugador(alvaro_fidalgo).                    % Consulta si es jugador
 </pre>
 </div>
 
@@ -155,146 +169,31 @@ diagnostico_preventivo(Paciente, Enfermedad) :-
 
 <div align="center">
 <h3>Funcionamiento Interno</h3>
-<p>ELIZA funciona mediante un ciclo de interacción con el usuario:</p>
+<p>ELIZA sigue un ciclo de interacción con el usuario:</p>
 <ul>
-<li>El usuario ingresa síntomas con el comando <code>tengo(Sintoma)</code>.</li>
+<li>El usuario ingresa síntomas mediante el comando <code>tengo(Sintoma)</code>.</li>
 <li>ELIZA registra los síntomas y genera un reporte con probabilidades de enfermedades.</li>
 <li>Permite jugar al Akinator con <code>quiero_jugar</code>, filtrando jugadores por posición y nacionalidad.</li>
-<li>Consulta relaciones familiares usando <code>padre(X,Y)</code>, <code>madre(X,Y)</code> o <code>abuelo(X,Y)</code>.</li>
-<li>Si el comando no es reconocido, ELIZA responde con un mensaje de error.</li>
+<li>Permite consultar relaciones familiares usando <code>padre(X,Y)</code>, <code>madre(X,Y)</code> o <code>abuelo(X,Y)</code>.</li>
+<li>Si el comando ingresado no es reconocido, ELIZA responde con un mensaje de error.</li>
 </ul>
 </div>
 
 <hr>
 
 <div align="center">
-<h3>Base de Conocimiento</h3>
-<p>La base de conocimiento contiene:</p>
-<ul>
-<li>Enfermedades y sus síntomas (ej. fiebre, dolor de cabeza, ictericia)</li>
-<li>Tratamientos y medicamentos asociados</li>
-<li>Médicos especializados</li>
-<li>Centros médicos</li>
-<li>Jugadores del Club América y árbol genealógico</li>
-<li>Reglas para diagnóstico exclusivo, por probabilidad, preventivo, y combinación de tratamientos</li>
-<li>Relaciones familiares: padre, madre, abuelo, etc.</li>
-<li>Detección de síntomas contradictorios</li>
-</ul>
-</div>
-
-<hr>
-
-<div align="center">
-<h3>Predicados principales en Prolog</h3>
+<h3>Implementación en Prolog</h3>
+<p>El siguiente código muestra la implementación completa en Prolog, incluyendo predicados, reglas de diagnóstico, Akinator y árbol familiar.</p>
 <pre>
-% --- Enfermedades ---
-enfermedad(covid).
-enfermedad(sinusitis).
-enfermedad(bronquitis).
-enfermedad(otitis).
-enfermedad(gastritis).
-
-% --- Síntomas ---
-sintoma(fiebre).
-sintoma(tos).
-sintoma(dolor_garganta).
-sintoma(dificultad_respirar).
-
-% --- Relación enfermedad ↔ síntomas ---
-tiene_sintoma(covid, fiebre).
-tiene_sintoma(covid, tos).
-tiene_sintoma(covid, dificultad_respirar).
-
-% --- Tratamientos ---
-tratamiento(covid, reposo).
-tratamiento(covid, paracetamol).
-</pre>
-</div>
-
-<hr>
-
-<div align="center">
-<h3>Jugadores del Club América y Árbol Genealógico</h3>
-<pre>
-jugador(henry_martin).
-jugador(luis_malagon).
-jugador(alvaro_fidalgo).
-jugador(diego_valdes).
-jugador(julian_quinones).
-jugador(jonathan_dos_santos).
-jugador(alex_zendejas).
-jugador(brian_rodriguez).
-jugador(sebastian_caceres).
-jugador(igor_lichnovsky).
-jugador(kevin_alvarez).
-
-% Árbol familiar de ejemplo
-padre(juan, alvaro_fidalgo).
-madre(maria, alvaro_fidalgo).
-abuelo(jorge, alvaro_fidalgo).
-
-padre(ricardo, diego_valdes).
-madre(laura, diego_valdes).
-abuelo(carlos, diego_valdes).
-</pre>
-</div>
-
-
-<hr>
-
-<div align="center">
-<h3>Diagnósticos y Reglas</h3>
-<pre>
-% Diagnóstico exclusivo
-diagnostico_exclusivo(Paciente, Enfermedad) :-
-  tiene_sintoma(Paciente, Sintoma),
-  tiene_sintoma(Enfermedad, Sintoma),
-  \+ (tiene_sintoma(Otra, Sintoma), Otra \= Enfermedad).
-
-% Diagnóstico por probabilidad
-probabilidad(Paciente, Enfermedad, Porcentaje) :-
-  findall(S, tiene_sintoma(Enfermedad, S), ListaSintomas),
-  findall(S, (tiene_sintoma(Paciente, S), member(S, ListaSintomas)), Confirmados),
-  length(ListaSintomas, Totales),
-  length(Confirmados, Cont),
-  Porcentaje is (Cont / Totales) * 100.
-
-% Diagnóstico preventivo
-diagnostico_preventivo(Paciente, Enfermedad) :-
-  findall(S, tiene_sintoma(Enfermedad, S), Sintomas),
-  findall(S, (tiene_sintoma(Paciente, S), member(S, Sintomas)), Confirmados),
-  Confirmados \= [],
-  length(Confirmados, Lc),
-  length(Sintomas, Lt),
-  Lc < Lt.
-</pre>
-</div>
-
-<hr>
-
-<div align="center">
-<h3>Ejemplos de Consultas</h3>
-<pre>
-?- tiene_sintoma(alvaro_fidalgo, fiebre).
-?- diagnostico_exclusivo(alvaro_fidalgo, covid).
-?- probabilidad(alvaro_fidalgo, covid, P).
-?- diagnostico_preventivo(alvaro_fidalgo, covid).
-?- padre(juan, alvaro_fidalgo).
-?- jugador(alvaro_fidalgo).
-</pre>
-</div>
-
-<hr>
-
-### Codigo prolog
-
-```prolog
 :- encoding(utf8).
 
+% --- Definición dinámica ---
+% Permite agregar y eliminar información durante la ejecución
 :- dynamic tiene_sintoma/2.
 :- dynamic candidatos/1.
 
-
+% --- Función principal ELIZA ---
+% Inicia la interacción con el usuario
 eliza :-
     retractall(tiene_sintoma(_,_)),
     retractall(candidatos(_)),
@@ -307,6 +206,7 @@ eliza :-
     writeln('- adios.'),
     ciclo.
 
+% --- Ciclo de interacción ---
 ciclo :-
     write('|: '),
     read(Entrada),
@@ -315,26 +215,23 @@ ciclo :-
     ciclo.
 ciclo :- writeln('Adios.').
 
-procesar(adios) :- !.
+% --- Procesamiento de comandos ---
+procesar(adios) :- !.  % Termina la interacción
 
-procesar(quiero_jugar) :-
-    iniciar_akinator, !.
+procesar(quiero_jugar) :- iniciar_akinator, !. % Inicia Akinator
 
-procesar(tengo(S)) :-
+procesar(tengo(S)) :-    % Registra síntomas
     assertz(tiene_sintoma(paciente, S)),
     writeln(['Sintoma registrado:', S]), !.
 
-procesar(reporte) :-
-    reporte(paciente), !.
+procesar(reporte) :- reporte(paciente), !. % Genera reporte médico
 
-procesar(X) :-
-    call(X),
-    writeln('Consulta realizada.'), !.
+procesar(X) :- call(X), writeln('Consulta realizada.'), !. % Ejecuta cualquier predicado
 
-procesar(_) :-
-    writeln('No te entendi.').
+procesar(_) :- writeln('No te entendi.'). % Comando desconocido
 
-% ---- Base jugadores ----
+% --- Base jugadores ---
+% Información de jugadores y características
 jugador(henry_martin, delantero, mexicano).
 jugador(luis_malagon, portero, mexicano).
 jugador(alvaro_fidalgo, mediocampista, extranjero).
@@ -347,6 +244,8 @@ jugador(sebastian_caceres, defensa, extranjero).
 jugador(igor_lichnovsky, defensa, extranjero).
 jugador(kevin_alvarez, defensa, mexicano).
 
+% --- Akinator ---
+% Funciones para adivinar el jugador
 iniciar_akinator :-
     findall(N, jugador(N,_,_), Lista),
     assertz(candidatos(Lista)),
@@ -394,6 +293,7 @@ filtrar_nacionalidad(_, no).
 es_pos(P, J) :- jugador(J, P, _).
 es_nacional(N, J) :- jugador(J, _, N).
 
+% --- Enfermedades y síntomas ---
 enfermedad(anemia).
 enfermedad(apendicitis).
 enfermedad(covid).
@@ -407,10 +307,12 @@ tiene_sintoma_enfermedad(fiebre, apendicitis).
 tiene_sintoma_enfermedad(fiebre, covid).
 tiene_sintoma_enfermedad(tos_seca, covid).
 
+% --- Tratamientos ---
 tratamiento(anemia, hierro).
 tratamiento(apendicitis, cirugia).
 tratamiento(covid, reposo).
 
+% --- Reglas de diagnóstico ---
 diagnostico_basico(P,E) :-
     enfermedad(E),
     forall(
@@ -433,6 +335,7 @@ reporte(P) :-
          writeln([E,Pc,'%']))
     ).
 
+% --- Relaciones familiares ---
 padre(juan,carlos).
 padre(carlos,pedro).
 madre(maria,carlos).
@@ -442,17 +345,20 @@ abuelo(X,Y) :- padre(X,Z), padre(Z,Y).
 abuelo(X,Y) :- padre(X,Z), madre(Z,Y).
 abuelo(X,Y) :- madre(X,Z), padre(Z,Y).
 abuelo(X,Y) :- madre(X,Z), madre(Z,Y).
+</pre>
+</div>
 
+<hr>
 
-```
 <div align="center">
 <h2>PROYECTO FINAL – ELIZA EN LISP</h2>
 </div>
 
----
+<hr>
 
 <div align="center">
 <h3>Base de Conocimiento – Jugadores del Club América</h3>
+<p>Esta sección define los jugadores, su posición y nacionalidad. Esta información es utilizada por Akinator para realizar preguntas de filtrado.</p>
 <pre>
 (defparameter *jugadores*
   '((henry-martin delantero mexicano)
@@ -469,10 +375,11 @@ abuelo(X,Y) :- madre(X,Z), madre(Z,Y).
 </pre>
 </div>
 
----
+<hr>
 
 <div align="center">
 <h3>Base de Conocimiento – Medicina</h3>
+<p>Define las enfermedades conocidas, los síntomas asociados y los tratamientos correspondientes. Se utiliza para calcular probabilidades y generar reportes.</p>
 <pre>
 (defparameter *enfermedades*
   '((anemia (cansancio palidez) hierro)
@@ -481,10 +388,11 @@ abuelo(X,Y) :- madre(X,Z), madre(Z,Y).
 </pre>
 </div>
 
----
+<hr>
 
 <div align="center">
 <h3>Base de Conocimiento – Familia</h3>
+<p>Contiene relaciones familiares que permiten consultar padre, madre y abuelo. Se utilizan funciones para evaluar estas relaciones.</p>
 <pre>
 (defparameter *familia*
   '((padre juan carlos)
@@ -506,10 +414,11 @@ abuelo(X,Y) :- madre(X,Z), madre(Z,Y).
 </pre>
 </div>
 
----
+<hr>
 
 <div align="center">
 <h3>Medicina – Funciones</h3>
+<p>Funciones que permiten registrar síntomas, calcular probabilidades de enfermedades y generar reportes completos de manera automatizada.</p>
 <pre>
 (defparameter *sintomas-paciente* '())
 
@@ -537,10 +446,11 @@ abuelo(X,Y) :- madre(X,Z), madre(Z,Y).
 </pre>
 </div>
 
----
+<hr>
 
 <div align="center">
 <h3>Akinator – Club América</h3>
+<p>Permite al usuario pensar en un jugador y ELIZA/Akinator hace preguntas de filtrado por posición y nacionalidad para adivinar al jugador.</p>
 <pre>
 (defparameter *candidatos* '())
 
@@ -553,76 +463,4 @@ abuelo(X,Y) :- madre(X,Z), madre(Z,Y).
   (format t "¿Es delantero? (si/no): ")
   (let ((r (read)))
     (when (equal r 'si)
-      (setf *candidatos*
-            (remove-if-not
-             (lambda (j) (equal (second j) 'delantero))
-             *candidatos*)))
-    (pregunta-nacionalidad)))
-
-(defun pregunta-nacionalidad ()
-  (format t "¿Es mexicano? (si/no): ")
-  (let ((r (read)))
-    (when (equal r 'si)
-      (setf *candidatos*
-            (remove-if-not
-             (lambda (j) (equal (third j) 'mexicano))
-             *candidatos*)))
-    (finalizar-akinator)))
-
-(defun finalizar-akinator ()
-  (cond
-    ((= (length *candidatos*) 1)
-     (format t "Estoy pensando en: ~a~%"
-             (first (first *candidatos*))))
-    (t
-     (format t "No estoy segura, posibles opciones: ~a~%"
-             (mapcar #'first *candidatos*)))))
-</pre>
-</div>
-
----
-
-<div align="center">
-<h3>ELIZA – Interacción</h3>
-<pre>
-(defun eliza ()
-  (format t "~%Hola, soy ELIZA.~%")
-  (format t "Comandos:~%")
-  (format t "- (tengo sintoma)~%")
-  (format t "- reporte~%")
-  (format t "- quiero-jugar~%")
-  (format t "- padre x y / madre x y / abuelo x y~%")
-  (format t "- adios~%")
-  (loop
-     (format t "~%> ")
-     (let ((entrada (read)))
-       (cond
-         ((equal entrada 'adios)
-          (format t "Adios.~%")
-          (return))
-         ((and (listp entrada) (equal (first entrada) 'tengo))
-          (agregar-sintoma (second entrada)))
-         ((equal entrada 'reporte)
-          (reporte-medico))
-         ((equal entrada 'quiero-jugar)
-          (iniciar-akinator))
-         ((and (listp entrada) (equal (first entrada) 'padre))
-          (format t "~a~%" (padre-p (second entrada) (third entrada))))
-         ((and (listp entrada) (equal (first entrada) 'madre))
-          (format t "~a~%" (madre-p (second entrada) (third entrada))))
-         ((and (listp entrada) (equal (first entrada) 'abuelo))
-          (format t "~a~%" (abuelo-p (second entrada) (third entrada))))
-         (t
-          (format t "No te entendi.~%"))))))
-</pre>
-</div>
-
-<div align="center">
-<h3>Conclusión</h3>
-<p>El sistema experto ELIZA en Prolog permite simular una interacción similar a un asistente médico, integrando una base de conocimiento amplia y reglas de inferencia que permiten diagnosticar enfermedades, recomendar tratamientos, identificar relaciones familiares y adivinar jugadores del Club América. El uso de Prolog facilita la representación lógica de conocimientos y relaciones complejas.</p>
-</div>
-
-
-</body>
-</html>
-
+      (setf *
